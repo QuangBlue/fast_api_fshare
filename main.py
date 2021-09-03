@@ -23,6 +23,13 @@ class LoginFshare (BaseModel):
     user_email: str
     password: str
 
+
+class LinkDownload(BaseModel):
+    zipflag: int
+    url: str
+    password: str
+    token: str
+
 #####
 
 
@@ -42,4 +49,19 @@ async def login_fshare(item: LoginFshare):
 
     r = requests.post(url, data=json.dumps(payload), headers=headers)
 
+    return r.json()
+
+
+@app.post("/linkDownload")
+async def login_fshare(item: LinkDownload):
+    headers = {'Cookie': 'session_id=snovdm5bva41kr2rassp8teg56'}
+
+    data = {
+        "zipflag": 0,
+        "url": "https://www.fshare.vn/file/VKT8CTTC1SMF1IB",
+        "password": "",
+        "token": "db533c16c7e812d05d50190e5a698acd5b98e66c"
+    }
+    r = requests.post('https://api.fshare.vn/api/session/download',
+                      data=json.dumps(data), headers=headers)
     return r.json()
