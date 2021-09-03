@@ -29,6 +29,7 @@ class LinkDownload(BaseModel):
     url: str
     password: str
     token: str
+    session_id: str
 
 #####
 
@@ -54,13 +55,13 @@ async def login_fshare(item: LoginFshare):
 
 @app.post("/linkDownload")
 async def login_fshare(item: LinkDownload):
-    headers = {'Cookie': 'session_id=snovdm5bva41kr2rassp8teg56'}
+    headers = {'Cookie': f'session_id={item.session_id}'}
 
     data = {
-        "zipflag": 0,
-        "url": "https://www.fshare.vn/file/VKT8CTTC1SMF1IB",
-        "password": "",
-        "token": "db533c16c7e812d05d50190e5a698acd5b98e66c"
+        "zipflag": item.zipflag,
+        "url": item.url,
+        "password": item.password,
+        "token": item.token,
     }
     r = requests.post('https://api.fshare.vn/api/session/download',
                       data=json.dumps(data), headers=headers)
