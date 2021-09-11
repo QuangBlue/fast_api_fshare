@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import requests
 import json
+import bs4
+from bs4 import BeautifulSoup
 import fastapi.middleware.cors as _cors
 
 app = FastAPI()
@@ -30,6 +32,10 @@ class LinkDownload(BaseModel):
     password: str
     token: str
     session_id: str
+
+
+class FileFshare(BaseModel):
+    link: str
 
 #####
 
@@ -66,3 +72,17 @@ async def login_fshare(item: LinkDownload):
     r = requests.post('https://api.fshare.vn/api/session/download',
                       data=json.dumps(data), headers=headers)
     return r.json()
+
+
+@app.post("/infoFshare")
+async def info_fshare(item: FileFshare):
+    url = item.link
+    r = requests.get(url)
+    html = r.text
+    soup = BeautifulSoup(html, 'html.parser')
+
+    titleFile = soup.find("div", class_="name").attrs["title"]
+    sizeFile = soup.find_all(
+        "button", id='download-free')[1].text.strip().split(" | ")[1]
+    json = {'title_file': titleFile, 'size_file': sizeFile}
+    return json.json()
